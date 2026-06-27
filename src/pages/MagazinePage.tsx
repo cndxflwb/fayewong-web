@@ -1,7 +1,6 @@
-import { useState, useEffect, useCallback, useRef, TouchEvent as ReactTouchEvent } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, ChevronLeft, ChevronRight, BookOpen } from 'lucide-react';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
-import LazyImage from '../components/LazyImage';
 import magazineData from '../../data/magazines.json';
 
 interface MagazineItem {
@@ -26,35 +25,7 @@ export default function MagazinePage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [activeNavYear, setActiveNavYear] = useState<string>('');
   const navRef = useRef<HTMLDivElement>(null);
-
-  // 触摸手势状态（仅用于 Lightbox 主图区域）
-  const touchStartX = useRef<number>(0);
-  const touchMoved = useRef<boolean>(false);
-
-  const handleSwipeStart = (e: ReactTouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchMoved.current = false;
-  };
-
-  const handleSwipeMove = (e: ReactTouchEvent) => {
-    touchMoved.current = true;
-    e.stopPropagation();
-  };
-
-  const handleSwipeEnd = (e: ReactTouchEvent) => {
-    if (!currentYear || !touchMoved.current) return;
-    const diff = touchStartX.current - e.changedTouches[0].clientX;
-    const items = data.years[currentYear];
-    const threshold = 50;
-
-    if (Math.abs(diff) < threshold) return;
-
-    if (diff > 0 && currentIndex < items.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    } else if (diff < 0 && currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
-  };
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
   const years = Object.keys(data.years).sort();
   const totalCount = Object.values(data.years).reduce((sum, items) => sum + items.length, 0);
@@ -102,14 +73,33 @@ export default function MagazinePage() {
     if (!activeNavYear || !navRef.current) return;
     const idx = years.indexOf(activeNavYear);
     if (idx < 0) return;
-    // 每个节点 minWidth 80px，滚动到节点中心
-    const nodeCenter = idx * 80 + 40 + 32; // 32 = px-8 padding
+    const nodeCenter = idx * 80 + 40 + 32;
     const container = navRef.current;
     const scrollTarget = nodeCenter - container.clientWidth / 2;
     container.scrollTo({ left: scrollTarget, behavior: 'smooth' });
   }, [activeNavYear, years]);
 
-  // 键盘控制 lightbox
+  // 打开/关闭 dialog
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (lightboxOpen) {
+      dialog.showModal();
+    } else {
+      dialog.close();
+    }
+  }, [lightboxOpen]);
+
+  // dialog 原生关闭事件（Escape 键、点击 backdrop）
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    const onClose = () => setLightboxOpen(false);
+    dialog.addEventListener('close', onClose);
+    return () => dialog.removeEventListener('close', onClose);
+  }, []);
+
+  // 键盘左右切换
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (!lightboxOpen || !currentYear) return;
@@ -118,8 +108,6 @@ export default function MagazinePage() {
         setCurrentIndex(currentIndex - 1);
       } else if (e.key === 'ArrowRight' && currentIndex < items.length - 1) {
         setCurrentIndex(currentIndex + 1);
-      } else if (e.key === 'Escape') {
-        setLightboxOpen(false);
       }
     },
     [lightboxOpen, currentYear, currentIndex]
@@ -130,11 +118,40 @@ export default function MagazinePage() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
-  // 禁止 lightbox 打开时滚动
+  // 移动端触摸滑动（原生事件绑定到 dialog）
   useEffect(() => {
-    document.body.style.overflow = lightboxOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [lightboxOpen]);
+    const dialog = dialogRef.current;
+    if (!dialog || !lightboxOpen) return;
+
+    let startX = 0;
+    let moved = false;
+
+    const onTouchStart = (e: TouchEvent) => {
+      startX = e.touches[0].clientX;
+      moved = false;
+    };
+    const onTouchMove = () => { moved = true; };
+    const onTouchEnd = (e: TouchEvent) => {
+      if (!moved || !currentYear) return;
+      const diff = startX - e.changedTouches[0].clientX;
+      const items = data.years[currentYear];
+      if (Math.abs(diff) < 50) return;
+      if (diff > 0 && currentIndex < items.length - 1) {
+        setCurrentIndex(prev => prev + 1);
+      } else if (diff < 0 && currentIndex > 0) {
+        setCurrentIndex(prev => prev - 1);
+      }
+    };
+
+    dialog.addEventListener('touchstart', onTouchStart, { passive: true });
+    dialog.addEventListener('touchmove', onTouchMove, { passive: true });
+    dialog.addEventListener('touchend', onTouchEnd, { passive: true });
+    return () => {
+      dialog.removeEventListener('touchstart', onTouchStart);
+      dialog.removeEventListener('touchmove', onTouchMove);
+      dialog.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [lightboxOpen, currentYear, currentIndex]);
 
   const openLightbox = (year: string, index: number) => {
     setCurrentYear(year);
@@ -290,84 +307,81 @@ export default function MagazinePage() {
         ))}
       </main>
 
-      {/* Lightbox 大图预览 */}
-      {lightboxOpen && currentItem && currentYear && (
-        <div
-          className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center"
-          onMouseDown={(e) => { if (e.target === e.currentTarget) setLightboxOpen(false); }}
-        >
-          {/* 关闭按钮 */}
-          <button
-            className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
-            onClick={() => setLightboxOpen(false)}
-          >
-            <X className="w-6 h-6 text-white" />
-          </button>
-
-          {/* 上一张 */}
-          {currentIndex > 0 && (
+      {/* Lightbox - 使用原生 dialog 元素 */}
+      <dialog
+        ref={dialogRef}
+        className="lightbox-dialog fixed inset-0 w-screen h-screen max-w-none max-h-none m-0 p-0 bg-black/95 backdrop-blur-sm z-[100] flex flex-col items-center justify-center"
+      >
+        {currentItem && currentYear && (
+          <div className="relative w-full h-full flex flex-col items-center justify-center">
+            {/* 关闭按钮 */}
             <button
-              className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
-              onClick={() => setCurrentIndex(currentIndex - 1)}
+              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer z-10"
+              onClick={() => setLightboxOpen(false)}
             >
-              <ChevronLeft className="w-6 h-6 text-white" />
+              <X className="w-6 h-6 text-white" />
             </button>
-          )}
 
-          {/* 下一张 */}
-          {currentIndex < data.years[currentYear].length - 1 && (
-            <button
-              className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
-              onClick={() => setCurrentIndex(currentIndex + 1)}
-            >
-              <ChevronRight className="w-6 h-6 text-white" />
-            </button>
-          )}
+            {/* 上一张 */}
+            {currentIndex > 0 && (
+              <button
+                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer z-10"
+                onClick={() => setCurrentIndex(currentIndex - 1)}
+              >
+                <ChevronLeft className="w-6 h-6 text-white" />
+              </button>
+            )}
 
-          {/* 主图（支持左右滑动切换） */}
-          <img
-            src={`/magazine-images/${currentItem.cover.replace(/\.(jpg|jpeg|png)$/i, '.webp')}`}
-            alt={currentItem.title}
-            className="max-h-[70vh] max-w-[85vw] object-contain rounded-lg shadow-2xl select-none"
-            draggable={false}
-            onTouchStart={handleSwipeStart}
-            onTouchMove={handleSwipeMove}
-            onTouchEnd={handleSwipeEnd}
-          />
+            {/* 下一张 */}
+            {currentIndex < data.years[currentYear].length - 1 && (
+              <button
+                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer z-10"
+                onClick={() => setCurrentIndex(currentIndex + 1)}
+              >
+                <ChevronRight className="w-6 h-6 text-white" />
+              </button>
+            )}
 
-          {/* 图片信息 */}
-          <div className="mt-4 text-center px-4">
-            <p className="text-white text-sm font-medium">
-              {currentItem.name} {currentItem.issue}
-            </p>
-            <p className="text-white/60 text-xs mt-1">
-              {currentItem.date} · {currentItem.title}
-            </p>
-            <p className="text-white/40 text-xs mt-2">
-              {currentIndex + 1} / {data.years[currentYear].length}
-            </p>
+            {/* 主图 */}
+            <img
+              src={`/magazine-images/${currentItem.cover.replace(/\.(jpg|jpeg|png)$/i, '.webp')}`}
+              alt={currentItem.title}
+              className="max-h-[70vh] max-w-[85vw] object-contain rounded-lg shadow-2xl select-none"
+              draggable={false}
+            />
+
+            {/* 图片信息 */}
+            <div className="mt-4 text-center px-4">
+              <p className="text-white text-sm font-medium">
+                {currentItem.name} {currentItem.issue}
+              </p>
+              <p className="text-white/60 text-xs mt-1">
+                {currentItem.date} · {currentItem.title}
+              </p>
+              <p className="text-white/40 text-xs mt-2">
+                {currentIndex + 1} / {data.years[currentYear].length}
+              </p>
+            </div>
+
+            {/* 缩略图条 */}
+            <div className="mt-4 flex gap-2 overflow-x-auto max-w-[90vw] px-4 py-2 scrollbar-thin">
+              {data.years[currentYear].map((item, i) => (
+                <img
+                  key={item.id}
+                  src={`/magazine-images/${item.cover.replace(/\.(jpg|jpeg|png)$/i, '.webp')}`}
+                  alt={item.title}
+                  className={`w-12 h-16 object-cover rounded cursor-pointer transition-all flex-shrink-0 ${
+                    i === currentIndex
+                      ? 'ring-2 ring-primary scale-110'
+                      : 'opacity-50 hover:opacity-80'
+                  }`}
+                  onClick={() => setCurrentIndex(i)}
+                />
+              ))}
+            </div>
           </div>
-
-          {/* 缩略图条 */}
-          <div
-            className="mt-4 flex gap-2 overflow-x-auto max-w-[90vw] px-4 py-2 scrollbar-thin"
-          >
-            {data.years[currentYear].map((item, i) => (
-              <img
-                key={item.id}
-                src={`/magazine-images/${item.cover.replace(/\.(jpg|jpeg|png)$/i, '.webp')}`}
-                alt={item.title}
-                className={`w-12 h-16 object-cover rounded cursor-pointer transition-all flex-shrink-0 ${
-                  i === currentIndex
-                    ? 'ring-2 ring-primary scale-110'
-                    : 'opacity-50 hover:opacity-80'
-                }`}
-                onClick={() => setCurrentIndex(i)}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+        )}
+      </dialog>
     </div>
   );
 }
