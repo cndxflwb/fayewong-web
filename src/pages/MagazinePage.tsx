@@ -27,31 +27,31 @@ export default function MagazinePage() {
   const [activeNavYear, setActiveNavYear] = useState<string>('');
   const navRef = useRef<HTMLDivElement>(null);
 
-  // 触摸手势状态
+  // 触摸手势状态（仅用于 Lightbox 主图区域）
   const touchStartX = useRef<number>(0);
-  const touchEndX = useRef<number>(0);
+  const touchMoved = useRef<boolean>(false);
 
-  const handleTouchStart = (e: ReactTouchEvent) => {
+  const handleSwipeStart = (e: ReactTouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
+    touchMoved.current = false;
   };
 
-  const handleTouchMove = (e: ReactTouchEvent) => {
-    touchEndX.current = e.touches[0].clientX;
+  const handleSwipeMove = (e: ReactTouchEvent) => {
+    touchMoved.current = true;
+    e.stopPropagation();
   };
 
-  const handleTouchEnd = () => {
-    if (!currentYear) return;
-    const diff = touchStartX.current - touchEndX.current;
+  const handleSwipeEnd = (e: ReactTouchEvent) => {
+    if (!currentYear || !touchMoved.current) return;
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
     const items = data.years[currentYear];
-    const threshold = 50; // 最小滑动距离
+    const threshold = 50;
 
     if (Math.abs(diff) < threshold) return;
 
     if (diff > 0 && currentIndex < items.length - 1) {
-      // 左滑 → 下一张
       setCurrentIndex(currentIndex + 1);
     } else if (diff < 0 && currentIndex > 0) {
-      // 右滑 → 上一张
       setCurrentIndex(currentIndex - 1);
     }
   };
@@ -295,9 +295,6 @@ export default function MagazinePage() {
         <div
           className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center"
           onMouseDown={(e) => { if (e.target === e.currentTarget) setLightboxOpen(false); }}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
         >
           {/* 关闭按钮 */}
           <button
@@ -327,11 +324,15 @@ export default function MagazinePage() {
             </button>
           )}
 
-          {/* 主图 */}
+          {/* 主图（支持左右滑动切换） */}
           <img
             src={`/magazine-images/${currentItem.cover.replace(/\.(jpg|jpeg|png)$/i, '.webp')}`}
             alt={currentItem.title}
-            className="max-h-[70vh] max-w-[85vw] object-contain rounded-lg shadow-2xl"
+            className="max-h-[70vh] max-w-[85vw] object-contain rounded-lg shadow-2xl select-none"
+            draggable={false}
+            onTouchStart={handleSwipeStart}
+            onTouchMove={handleSwipeMove}
+            onTouchEnd={handleSwipeEnd}
           />
 
           {/* 图片信息 */}
