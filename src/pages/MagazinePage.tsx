@@ -17,6 +17,7 @@ interface MagazineData {
 }
 
 const data = magazineData as MagazineData;
+const BASE = import.meta.env.BASE_URL;
 
 export default function MagazinePage() {
   useDocumentTitle('雜誌封面館');
@@ -290,7 +291,7 @@ export default function MagazinePage() {
                 >
                   <div className="relative overflow-hidden rounded-lg bg-bg-dark border border-primary/10 hover:border-primary/30 transition-all hover:shadow-lg hover:shadow-primary/5 h-[240px]">
                     <img
-                      src={`/magazine-images/${item.cover.replace(/\.(jpg|jpeg|png)$/i, '.webp')}`}
+                      src={`${BASE}magazine-images/${item.cover.replace(/\.(jpg|jpeg|png)$/i, '.webp')}`}
                       alt={item.title}
                       loading="lazy"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -354,7 +355,7 @@ export default function MagazinePage() {
 
             {/* 主图 */}
             <img
-              src={`/magazine-images/${currentItem.cover.replace(/\.(jpg|jpeg|png)$/i, '.webp')}`}
+              src={`${BASE}magazine-images/${currentItem.cover.replace(/\.(jpg|jpeg|png)$/i, '.webp')}`}
               alt={currentItem.title}
               className="max-h-[70vh] max-w-[85vw] object-contain rounded-lg shadow-2xl select-none pointer-events-auto"
               draggable={false}
@@ -378,7 +379,7 @@ export default function MagazinePage() {
               {data.years[currentYear].map((item, i) => (
                 <img
                   key={item.id}
-                  src={`/magazine-images/${item.cover.replace(/\.(jpg|jpeg|png)$/i, '.webp')}`}
+                  src={`${BASE}magazine-images/${item.cover.replace(/\.(jpg|jpeg|png)$/i, '.webp')}`}
                   alt={item.title}
                   className={`w-12 h-16 object-cover rounded cursor-pointer transition-all flex-shrink-0 ${
                     i === currentIndex

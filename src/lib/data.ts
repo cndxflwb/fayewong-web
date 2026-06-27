@@ -30,18 +30,20 @@ export function getTimelineByYear(year: number): TimelineEntry | undefined {
   return timeline.find(t => t.year === year);
 }
 
+const BASE = import.meta.env.BASE_URL;
+
 export function getImageUrl(filename: string): string {
   // Try exact match first
   if (imageMap[filename]) {
-    return `/images/${imageMap[filename]}`;
+    return `${BASE}images/${imageMap[filename]}`;
   }
   // Try with common extensions (prefer webp)
   for (const ext of ['.webp', '.jpg', '.png', '.jpeg']) {
     if (imageMap[filename + ext]) {
-      return `/images/${imageMap[filename + ext]}`;
+      return `${BASE}images/${imageMap[filename + ext]}`;
     }
   }
-  return `/images/${filename}.webp`;
+  return `${BASE}images/${filename}.webp`;
 }
 
 export function getAlbumsByYear(year: number): Album[] {
