@@ -268,7 +268,7 @@ export default function MagazinePage() {
             key={year}
             id={`mag-year-${year}`}
             data-year={year}
-            className="mb-16 scroll-mt-[200px]"
+            className="mb-16 scroll-mt-[260px]"
           >
             {/* 年份标题 */}
             <div className="flex items-center gap-4 mb-6">
