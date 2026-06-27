@@ -136,10 +136,19 @@ export default function MagazinePage() {
     return () => { document.body.style.overflow = ''; };
   }, [lightboxOpen]);
 
+  const openTimeRef = useRef<number>(0);
+
   const openLightbox = (year: string, index: number) => {
     setCurrentYear(year);
     setCurrentIndex(index);
     setLightboxOpen(true);
+    openTimeRef.current = Date.now();
+  };
+
+  const closeLightbox = () => {
+    // 防止打开瞬间被同一个 click 事件关闭
+    if (Date.now() - openTimeRef.current < 300) return;
+    setLightboxOpen(false);
   };
 
   const currentItem = currentYear ? data.years[currentYear]?.[currentIndex] : null;
@@ -294,7 +303,7 @@ export default function MagazinePage() {
       {lightboxOpen && currentItem && currentYear && (
         <div
           className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center"
-          onClick={() => setLightboxOpen(false)}
+          onClick={closeLightbox}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
@@ -302,7 +311,7 @@ export default function MagazinePage() {
           {/* 关闭按钮 */}
           <button
             className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
-            onClick={() => setLightboxOpen(false)}
+            onClick={closeLightbox}
           >
             <X className="w-6 h-6 text-white" />
           </button>
