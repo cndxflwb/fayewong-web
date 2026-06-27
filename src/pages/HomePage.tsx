@@ -87,7 +87,7 @@ export default function HomePage() {
           <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-accent-teal rounded-full blur-[96px]" />
         </div>
 
-        <h2 className="relative text-xl font-bold text-text mb-6 text-center font-serif shrink-0">
+        <h2 className="relative text-xl font-bold text-text mb-6 text-center font-serif shrink-0 mt-12">
           編年時間線
         </h2>
 
