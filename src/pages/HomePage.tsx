@@ -40,68 +40,62 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen">
+    <div className="h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-24 lg:py-36">
+      <section className="relative overflow-hidden py-8 lg:py-10 shrink-0">
         <div className="absolute inset-0 bg-gradient-to-b from-bg-dark via-bg to-bg-secondary" />
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary rounded-full blur-[128px]" />
           <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-accent-teal rounded-full blur-[96px]" />
         </div>
         <div className="relative max-w-5xl mx-auto px-4 text-center">
-          <h1 className="text-5xl lg:text-7xl font-bold font-serif text-primary mb-4 tracking-wider">
+          <h1 className="text-4xl lg:text-5xl font-bold font-serif text-primary mb-4 tracking-wider">
             菲樂集
           </h1>
-          <p className="text-xl lg:text-2xl text-text-secondary font-light mb-2">
-            王菲演唱歌曲編年
-          </p>
-          <p className="text-sm text-text-muted mb-12">
-            赤霓編 · {stats.yearRange}
-          </p>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
-            <div className="bg-bg-dark/50 backdrop-blur border border-primary/10 rounded-xl p-5 hover:border-primary/30 transition-colors">
-              <Music className="w-6 h-6 text-primary mx-auto mb-2" />
-              <div className="text-2xl font-bold text-text">{stats.totalSongs}</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
+            <div className="bg-bg-dark/50 backdrop-blur border border-primary/10 rounded-xl p-3 hover:border-primary/30 transition-colors">
+              <Music className="w-5 h-5 text-primary mx-auto mb-1" />
+              <div className="text-xl font-bold text-text">{stats.totalSongs}</div>
               <div className="text-xs text-text-muted">首歌曲</div>
             </div>
-            <div className="bg-bg-dark/50 backdrop-blur border border-primary/10 rounded-xl p-5 hover:border-primary/30 transition-colors">
-              <Disc3 className="w-6 h-6 text-accent-teal mx-auto mb-2" />
-              <div className="text-2xl font-bold text-text">{stats.totalAlbums}</div>
+            <div className="bg-bg-dark/50 backdrop-blur border border-primary/10 rounded-xl p-3 hover:border-primary/30 transition-colors">
+              <Disc3 className="w-5 h-5 text-accent-teal mx-auto mb-1" />
+              <div className="text-xl font-bold text-text">{stats.totalAlbums}</div>
               <div className="text-xs text-text-muted">張專輯</div>
             </div>
-            <div className="bg-bg-dark/50 backdrop-blur border border-primary/10 rounded-xl p-5 hover:border-primary/30 transition-colors">
-              <Calendar className="w-6 h-6 text-accent-yellow mx-auto mb-2" />
-              <div className="text-2xl font-bold text-text">{stats.totalYears}</div>
+            <div className="bg-bg-dark/50 backdrop-blur border border-primary/10 rounded-xl p-3 hover:border-primary/30 transition-colors">
+              <Calendar className="w-5 h-5 text-accent-yellow mx-auto mb-1" />
+              <div className="text-xl font-bold text-text">{stats.totalYears}</div>
               <div className="text-xs text-text-muted">個年份</div>
             </div>
-            <div className="bg-bg-dark/50 backdrop-blur border border-primary/10 rounded-xl p-5 hover:border-primary/30 transition-colors">
-              <Users className="w-6 h-6 text-accent-mint mx-auto mb-2" />
-              <div className="text-lg font-bold text-text truncate">{topCollaborator?.name}</div>
+            <div className="bg-bg-dark/50 backdrop-blur border border-primary/10 rounded-xl p-3 hover:border-primary/30 transition-colors">
+              <Users className="w-5 h-5 text-accent-mint mx-auto mb-1" />
+              <div className="text-base font-bold text-text truncate">{topCollaborator?.name}</div>
               <div className="text-xs text-text-muted">合作最多（{topCollaborator?.count}首）</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Timeline - Horizontal (一屏高度) */}
-      <section className="relative h-[calc(100vh-4rem)] flex flex-col justify-center overflow-hidden">
+      {/* Timeline - Horizontal */}
+      <section className="relative flex-1 flex flex-col justify-center overflow-hidden min-h-0">
         {/* 装饰光晕背景 */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary rounded-full blur-[128px]" />
           <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-accent-teal rounded-full blur-[96px]" />
         </div>
 
-        <h2 className="relative text-2xl font-bold text-text mb-12 text-center font-serif">
+        <h2 className="relative text-xl font-bold text-text mb-6 text-center font-serif shrink-0">
           編年時間線
         </h2>
 
-        <div className="relative">
+        <div className="relative flex-1 flex flex-col justify-center min-h-0">
           {/* Horizontal scrollable container */}
           <div
             ref={timelineRef}
-            className="overflow-x-auto pb-8 scrollbar-thin">
+            className="overflow-x-auto pb-4 scrollbar-thin">
             <div className="relative min-w-max px-12">
               {/* Horizontal line */}
               <div className="absolute left-0 right-0 top-1/2 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
@@ -165,7 +159,7 @@ export default function HomePage() {
           </div>
 
           {/* Scroll hint */}
-          <div className="text-center mt-4">
+          <div className="text-center mt-2 shrink-0">
             <span className="text-xs text-text-muted">← 左右滑動瀏覽時間線 →</span>
           </div>
         </div>
