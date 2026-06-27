@@ -1,6 +1,9 @@
 import { useParams, Link, useLocation } from 'react-router-dom';
-import { ArrowLeft, Clock, ExternalLink, Music, User, PenTool, Headphones, Disc3 } from 'lucide-react';
+import { ArrowLeft, Clock, ExternalLink, Music, User, PenTool, Headphones, Disc3, Play } from 'lucide-react';
 import { getSongBySlug, getImageUrl, getAlbumsContainingSong, songs } from '../lib/data';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { useMetaTags } from '../components/MetaTags';
+import Breadcrumb from '../components/Breadcrumb';
 
 function renderNoteWithLinks(note: string) {
   const urlRegex = /(https?:\/\/[^\s\u4e00-\u9fff\u3000-\u303f]+)/g;
@@ -19,6 +22,14 @@ export default function SongPage() {
   const song = getSongBySlug(slug || '');
   const routeState = location.state as { from?: { label: string; path: string } } | null;
 
+  // 页面标题 & OG
+  useDocumentTitle(song?.title);
+  useMetaTags({
+    title: song?.title || '歌曲',
+    description: song ? `${song.title} - ${song.year}年${song.albumTitle ? ' · ' + song.albumTitle : ''} · 作曲：${song.composer.join('/')}` : undefined,
+    image: song?.images[0] ? getImageUrl(song.images[0].filename) : undefined,
+  });
+
   if (!song) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-24 text-center">
@@ -34,8 +45,25 @@ export default function SongPage() {
   const prevSong = currentIdx > 0 ? albumSongs[currentIdx - 1] : null;
   const nextSong = currentIdx < albumSongs.length - 1 ? albumSongs[currentIdx + 1] : null;
 
+  // 面包屑
+  const breadcrumbItems = [
+    { label: `${song.year}年`, path: `/year/${song.year}` },
+    ...(song.albumSlug ? [{ label: song.albumTitle || '專輯', path: `/album/${song.albumSlug}` }] : []),
+    { label: song.title },
+  ];
+
+  // 播放链接
+  const encodedTitle = encodeURIComponent(song.title + ' 王菲');
+  const musicLinks = [
+    { name: 'QQ音樂', url: `https://y.qq.com/n/ryqq/search?w=${encodedTitle}` },
+    { name: '網易雲', url: `https://music.163.com/#/search/m/?s=${encodedTitle}` },
+  ];
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
+      {/* 面包屑导航 */}
+      <Breadcrumb items={breadcrumbItems} />
+
       {/* Back link - prioritize previous page context */}
       {routeState?.from ? (
         <Link to={routeState.from.path} className="inline-flex items-center gap-2 text-text-muted hover:text-primary transition-colors mb-8">
@@ -248,6 +276,26 @@ export default function SongPage() {
               </div>
             </div>
           )}
+
+          {/* 播放链接 */}
+          <div className="bg-bg-secondary/30 rounded-xl border border-primary/10 p-4">
+            <h3 className="text-xs font-medium text-text-muted uppercase tracking-wider mb-3">在線試聽</h3>
+            <div className="space-y-2">
+              {musicLinks.map((link) => (
+                <a
+                  key={link.name}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-primary hover:text-primary-light transition-colors"
+                >
+                  <Play className="w-3.5 h-3.5" />
+                  <span>{link.name}</span>
+                  <ExternalLink className="w-3 h-3 ml-auto text-text-muted" />
+                </a>
+              ))}
+            </div>
+          </div>
         </aside>
       </div>
     </div>

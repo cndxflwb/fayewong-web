@@ -1,11 +1,14 @@
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Music, Clock, Building } from 'lucide-react';
 import { getAlbumBySlug, getSongsByAlbum, getImageUrl } from '../lib/data';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import Breadcrumb from '../components/Breadcrumb';
 
 export default function AlbumPage() {
   const { slug } = useParams<{ slug: string }>();
   const album = getAlbumBySlug(slug || '');
   const albumSongs = album ? getSongsByAlbum(album.slug) : [];
+  useDocumentTitle(album?.title);
 
   if (!album) {
     return (
@@ -18,6 +21,10 @@ export default function AlbumPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
+      <Breadcrumb items={[
+        { label: `${album.year}年`, path: `/year/${album.year}` },
+        { label: album.title },
+      ]} />
       <Link to={`/year/${album.year}`} className="inline-flex items-center gap-2 text-text-muted hover:text-primary transition-colors mb-8">
         <ArrowLeft className="w-4 h-4" />
         <span className="text-sm">返回 {album.year}年</span>

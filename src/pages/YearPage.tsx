@@ -1,15 +1,19 @@
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Disc3, Music } from 'lucide-react';
 import { getAlbumsByYear, songs, getImageUrl } from '../lib/data';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import Breadcrumb from '../components/Breadcrumb';
 
 export default function YearPage() {
   const { year } = useParams<{ year: string }>();
   const yearNum = parseInt(year || '0');
+  useDocumentTitle(`${yearNum}年`);
   const yearAlbums = getAlbumsByYear(yearNum);
   const yearSongs = songs.filter(s => s.year === yearNum);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
+      <Breadcrumb items={[{ label: `${yearNum}年` }]} />
       <Link to="/" className="inline-flex items-center gap-2 text-text-muted hover:text-primary transition-colors mb-8">
         <ArrowLeft className="w-4 h-4" />
         <span className="text-sm">返回時間線</span>

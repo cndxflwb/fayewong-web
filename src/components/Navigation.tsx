@@ -6,6 +6,8 @@ const navLinks = [
   { path: '/', label: '時間線' },
   { path: '/index/songs', label: '索引' },
   { path: '/search', label: '搜索' },
+  { path: '/magazine', label: '雜誌' },
+  { path: '/stats', label: '統計' },
   { path: '/about', label: '關於' },
 ];
 

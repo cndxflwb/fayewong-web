@@ -1,11 +1,28 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Music, Disc3, Calendar, Users } from 'lucide-react';
-import { timeline, getTotalStats } from '../lib/data';
+import { timeline, getTotalStats, songs } from '../lib/data';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
 export default function HomePage() {
+  useDocumentTitle();
   const stats = getTotalStats();
   const timelineRef = useRef<HTMLDivElement>(null);
+
+  // 统计合作最多的人（作曲+作词）
+  const topCollaborator = useMemo(() => {
+    const counter: Record<string, number> = {};
+    for (const song of songs) {
+      const people = [...song.composer, ...song.lyricist, ...song.arranger];
+      for (const p of people) {
+        if (p && p !== '王菲' && p !== 'Faye Wong') {
+          counter[p] = (counter[p] || 0) + 1;
+        }
+      }
+    }
+    const sorted = Object.entries(counter).sort((a, b) => b[1] - a[1]);
+    return sorted[0] ? { name: sorted[0][0], count: sorted[0][1] } : null;
+  }, []);
 
   useEffect(() => {
     const el = timelineRef.current;
@@ -61,8 +78,8 @@ export default function HomePage() {
             </div>
             <div className="bg-bg-dark/50 backdrop-blur border border-primary/10 rounded-xl p-5 hover:border-primary/30 transition-colors">
               <Users className="w-6 h-6 text-accent-mint mx-auto mb-2" />
-              <div className="text-2xl font-bold text-text">43</div>
-              <div className="text-xs text-text-muted">年跨度</div>
+              <div className="text-lg font-bold text-text truncate">{topCollaborator?.name}</div>
+              <div className="text-xs text-text-muted">合作最多（{topCollaborator?.count}首）</div>
             </div>
           </div>
         </div>

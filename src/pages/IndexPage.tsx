@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Music, PenTool, Headphones, User, ArrowDownAZ, ArrowDown01 } from 'lucide-react';
 import { siteIndex } from '../lib/data';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import type { IndexEntry } from '../types';
 
 type SortMode = 'alpha' | 'count';
@@ -32,6 +33,8 @@ export default function IndexPage() {
   const navigate = useNavigate();
   const currentCategory = category || 'songs';
   const data = getCategoryData(currentCategory);
+  const catLabel = categories.find(c => c.key === currentCategory)?.label || '索引';
+  useDocumentTitle(`${catLabel}索引`);
   const [activeLetter, setActiveLetter] = useState<string | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>('alpha');
   const [expandedEntries, setExpandedEntries] = useState<Set<string>>(new Set());

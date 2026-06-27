@@ -13,9 +13,9 @@ export default {
           light: '#E8D5A3',
         },
         bg: {
-          DEFAULT: '#1A1A2E',
-          secondary: '#16213E',
-          dark: '#0F0F1A',
+          DEFAULT: '#222240',
+          secondary: '#1E2A4A',
+          dark: '#181828',
         },
         text: {
           DEFAULT: '#F5F5F5',

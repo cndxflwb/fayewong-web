@@ -35,13 +35,13 @@ export function getImageUrl(filename: string): string {
   if (imageMap[filename]) {
     return `/images/${imageMap[filename]}`;
   }
-  // Try with common extensions
-  for (const ext of ['.jpg', '.png', '.jpeg']) {
+  // Try with common extensions (prefer webp)
+  for (const ext of ['.webp', '.jpg', '.png', '.jpeg']) {
     if (imageMap[filename + ext]) {
       return `/images/${imageMap[filename + ext]}`;
     }
   }
-  return `/images/${filename}.jpg`;
+  return `/images/${filename}.webp`;
 }
 
 export function getAlbumsByYear(year: number): Album[] {

@@ -1,6 +1,8 @@
 import { BookOpen, Heart, Info } from 'lucide-react';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
 export default function AboutPage() {
+  useDocumentTitle('關於');
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
       <h1 className="text-3xl font-bold font-serif text-text mb-12 text-center">關於本站</h1>
