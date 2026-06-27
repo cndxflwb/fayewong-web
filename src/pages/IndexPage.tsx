@@ -157,6 +157,7 @@ export default function IndexPage() {
             <Link
               key={entry.slug}
               to={`/song/${entry.songs[0]?.slug || ''}`}
+              state={{ from: { label: `索引 · ${categories.find(c => c.key === currentCategory)?.label || ''}`, path: `/index/${currentCategory}` } }}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-bg-secondary/50 transition-colors group"
             >
               <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -192,6 +193,7 @@ export default function IndexPage() {
                   <Link
                     key={`${song.slug}-${i}`}
                     to={`/song/${song.slug}`}
+                    state={{ from: { label: `索引 · ${categories.find(c => c.key === currentCategory)?.label || ''}`, path: `/index/${currentCategory}` } }}
                     className="text-xs px-2 py-1 rounded bg-bg-dark/50 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors"
                   >
                     {song.title}

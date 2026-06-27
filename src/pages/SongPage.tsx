@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { ArrowLeft, Clock, ExternalLink, Music, User, PenTool, Headphones, Disc3 } from 'lucide-react';
 import { getSongBySlug, getImageUrl, getAlbumsContainingSong, songs } from '../lib/data';
 
@@ -15,7 +15,9 @@ function renderNoteWithLinks(note: string) {
 
 export default function SongPage() {
   const { slug } = useParams<{ slug: string }>();
+  const location = useLocation();
   const song = getSongBySlug(slug || '');
+  const routeState = location.state as { from?: { label: string; path: string } } | null;
 
   if (!song) {
     return (
@@ -34,8 +36,13 @@ export default function SongPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
-      {/* Back link */}
-      {song.albumSlug ? (
+      {/* Back link - prioritize previous page context */}
+      {routeState?.from ? (
+        <Link to={routeState.from.path} className="inline-flex items-center gap-2 text-text-muted hover:text-primary transition-colors mb-8">
+          <ArrowLeft className="w-4 h-4" />
+          <span className="text-sm">返回 {routeState.from.label}</span>
+        </Link>
+      ) : song.albumSlug ? (
         <Link to={`/album/${song.albumSlug}`} className="inline-flex items-center gap-2 text-text-muted hover:text-primary transition-colors mb-8">
           <ArrowLeft className="w-4 h-4" />
           <span className="text-sm">返回 {song.albumTitle}</span>

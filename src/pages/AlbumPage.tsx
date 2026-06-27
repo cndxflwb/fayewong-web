@@ -107,6 +107,7 @@ export default function AlbumPage() {
                 <Link
                   key={song.slug}
                   to={`/song/${song.slug}`}
+                  state={{ from: { label: album.title, path: `/album/${album.slug}` } }}
                   className="flex items-center gap-4 p-4 rounded-lg bg-bg-secondary/30 border border-primary/5 hover:border-primary/20 hover:bg-bg-secondary/60 transition-all group"
                 >
                   <span className="w-8 text-center text-sm text-text-muted font-mono">
@@ -162,7 +163,7 @@ export default function AlbumPage() {
                   );
                   elements.push(
                     track.songSlug ? (
-                      <Link key={idx} to={`/song/${track.songSlug}`}>
+                      <Link key={idx} to={`/song/${track.songSlug}`} state={{ from: { label: album.title, path: `/album/${album.slug}` } }}>
                         {trackContent}
                       </Link>
                     ) : (

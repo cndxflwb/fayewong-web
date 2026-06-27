@@ -79,6 +79,7 @@ export default function YearPage() {
             <Link
               key={song.slug}
               to={`/song/${song.slug}`}
+              state={{ from: { label: `${year}年`, path: `/year/${year}` } }}
               className="flex items-center gap-3 p-3 rounded-lg bg-bg-secondary/30 border border-primary/5 hover:border-primary/20 hover:bg-bg-secondary/60 transition-all group"
             >
               <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">

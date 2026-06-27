@@ -68,6 +68,7 @@ export default function SearchPage() {
           <Link
             key={`${item.slug}-${idx}`}
             to={getLink(item)}
+            state={item.type === 'song' ? { from: { label: '搜索', path: '/search' } } : undefined}
             className="flex items-start gap-4 p-4 rounded-xl bg-bg-secondary/30 border border-primary/5 hover:border-primary/20 hover:bg-bg-secondary/60 transition-all group"
           >
             <div className="w-9 h-9 rounded-full bg-bg-dark flex items-center justify-center flex-shrink-0 mt-0.5">
