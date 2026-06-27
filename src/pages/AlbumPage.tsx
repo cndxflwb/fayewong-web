@@ -72,7 +72,7 @@ export default function AlbumPage() {
             <div className="mt-6 pt-4 border-t border-primary/10">
               <h3 className="text-xs text-text-muted uppercase tracking-wider mb-3">製作團隊</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                {Object.entries(album.crew).slice(0, 10).map(([role, name]) => (
+                {Object.entries(album.crew).filter(([, name]) => name != null).slice(0, 10).map(([role, name]) => (
                   <div key={role} className="flex gap-2">
                     <span className="text-text-muted flex-shrink-0">{role}：</span>
                     <span className="text-text-secondary">{name}</span>

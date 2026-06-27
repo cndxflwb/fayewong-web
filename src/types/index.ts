@@ -60,7 +60,7 @@ export interface Album {
   publisher: string | null;
   distributor: string | null;
   releaseDate: string | null;
-  crew: Record<string, string>;
+  crew: Record<string, string | undefined>;
   description: string;
   trackList: TrackListItem[];
   versions: string[];
