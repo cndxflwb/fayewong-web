@@ -3,6 +3,7 @@ import { ArrowLeft, Music, Clock, Building } from 'lucide-react';
 import { getAlbumBySlug, getSongsByAlbum, getImageUrl } from '../lib/data';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import Breadcrumb from '../components/Breadcrumb';
+import LazyImage from '../components/LazyImage';
 
 export default function AlbumPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -34,7 +35,7 @@ export default function AlbumPage() {
       <div className="flex flex-col md:flex-row gap-8 mb-12">
         {album.images.length > 0 ? (
           <div className="w-full md:w-72 flex-shrink-0">
-            <img
+            <LazyImage
               src={getImageUrl(album.images[0].filename)}
               alt={album.title}
               className="w-full rounded-xl shadow-2xl shadow-primary/10"

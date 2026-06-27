@@ -3,6 +3,7 @@ import { ArrowLeft, Disc3, Music } from 'lucide-react';
 import { getAlbumsByYear, songs, getImageUrl } from '../lib/data';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import Breadcrumb from '../components/Breadcrumb';
+import LazyImage from '../components/LazyImage';
 
 export default function YearPage() {
   const { year } = useParams<{ year: string }>();
@@ -45,14 +46,12 @@ export default function YearPage() {
                   className="group bg-bg-secondary/50 border border-primary/10 rounded-xl overflow-hidden hover:border-primary/30 transition-all hover:shadow-lg hover:shadow-primary/5"
                 >
                   {album.images.length > 0 ? (
-                    <div className="aspect-square bg-bg-dark overflow-hidden">
-                      <img
-                        src={getImageUrl(album.images[0].filename)}
-                        alt={album.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        loading="lazy"
-                      />
-                    </div>
+                    <LazyImage
+                      src={getImageUrl(album.images[0].filename)}
+                      alt={album.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      aspectRatio="aspect-square"
+                    />
                   ) : (
                     <div className="aspect-square bg-gradient-to-br from-bg-dark to-bg-secondary flex items-center justify-center">
                       <Disc3 className="w-16 h-16 text-primary/20" />

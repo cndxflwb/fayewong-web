@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, TouchEvent as ReactTouchEvent } from 'react';
 import { X, ChevronLeft, ChevronRight, BookOpen } from 'lucide-react';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import LazyImage from '../components/LazyImage';
 import magazineData from '../../data/magazines.json';
 
 interface MagazineItem {
@@ -25,6 +26,35 @@ export default function MagazinePage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [activeNavYear, setActiveNavYear] = useState<string>('');
   const navRef = useRef<HTMLDivElement>(null);
+
+  // 触摸手势状态
+  const touchStartX = useRef<number>(0);
+  const touchEndX = useRef<number>(0);
+
+  const handleTouchStart = (e: ReactTouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = (e: ReactTouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!currentYear) return;
+    const diff = touchStartX.current - touchEndX.current;
+    const items = data.years[currentYear];
+    const threshold = 50; // 最小滑动距离
+
+    if (Math.abs(diff) < threshold) return;
+
+    if (diff > 0 && currentIndex < items.length - 1) {
+      // 左滑 → 下一张
+      setCurrentIndex(currentIndex + 1);
+    } else if (diff < 0 && currentIndex > 0) {
+      // 右滑 → 上一张
+      setCurrentIndex(currentIndex - 1);
+    }
+  };
 
   const years = Object.keys(data.years).sort();
   const totalCount = Object.values(data.years).reduce((sum, items) => sum + items.length, 0);
@@ -237,10 +267,9 @@ export default function MagazinePage() {
                   onClick={() => openLightbox(year, index)}
                 >
                   <div className="relative overflow-hidden rounded-lg bg-bg-dark border border-primary/10 hover:border-primary/30 transition-all hover:shadow-lg hover:shadow-primary/5">
-                    <img
+                    <LazyImage
                       src={`/magazine-images/${item.cover.replace(/\.(jpg|jpeg|png)$/i, '.webp')}`}
                       alt={item.title}
-                      loading="lazy"
                       className="w-full h-[240px] object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -265,6 +294,9 @@ export default function MagazinePage() {
         <div
           className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center"
           onClick={() => setLightboxOpen(false)}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         >
           {/* 关闭按钮 */}
           <button
