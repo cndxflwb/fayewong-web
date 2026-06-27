@@ -73,8 +73,7 @@
 }
 
 .lightbox-dialog::backdrop {
-  background: rgba(0, 0, 0, 0.95);
-  backdrop-filter: blur(4px);
+  background: transparent;
 }
 
 .lightbox-dialog[open] {

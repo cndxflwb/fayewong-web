@@ -99,18 +99,7 @@ export default function MagazinePage() {
     return () => dialog.removeEventListener('close', onClose);
   }, []);
 
-  // 点击 backdrop（空白处）关闭
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    const onClick = (e: MouseEvent) => {
-      if (e.target === dialog) {
-        dialog.close();
-      }
-    };
-    dialog.addEventListener('click', onClick);
-    return () => dialog.removeEventListener('click', onClick);
-  }, []);
+
 
   // 键盘左右切换
   const handleKeyDown = useCallback(
@@ -323,13 +312,18 @@ export default function MagazinePage() {
       {/* Lightbox - 使用原生 dialog 元素 */}
       <dialog
         ref={dialogRef}
-        className="lightbox-dialog fixed inset-0 w-screen h-screen max-w-none max-h-none m-0 p-0 bg-black/95 backdrop-blur-sm z-[100] flex flex-col items-center justify-center"
+        className="lightbox-dialog fixed inset-0 w-screen h-screen max-w-none max-h-none m-0 p-0 bg-transparent z-[100]"
       >
+        {/* backdrop 层 - 点击关闭 */}
+        <div
+          className="absolute inset-0 bg-black/95 backdrop-blur-sm"
+          onClick={() => setLightboxOpen(false)}
+        />
         {currentItem && currentYear && (
-          <div className="relative w-full h-full flex flex-col items-center justify-center" onClick={(e) => e.stopPropagation()}>
+          <div className="relative z-10 w-full h-full flex flex-col items-center justify-center pointer-events-none">
             {/* 关闭按钮 */}
             <button
-              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer z-10"
+              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer z-10 pointer-events-auto"
               onClick={() => setLightboxOpen(false)}
             >
               <X className="w-6 h-6 text-white" />
@@ -338,7 +332,7 @@ export default function MagazinePage() {
             {/* 上一张 */}
             {currentIndex > 0 && (
               <button
-                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer z-10"
+                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer z-10 pointer-events-auto"
                 onClick={() => setCurrentIndex(currentIndex - 1)}
               >
                 <ChevronLeft className="w-6 h-6 text-white" />
@@ -348,7 +342,7 @@ export default function MagazinePage() {
             {/* 下一张 */}
             {currentIndex < data.years[currentYear].length - 1 && (
               <button
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer z-10"
+                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer z-10 pointer-events-auto"
                 onClick={() => setCurrentIndex(currentIndex + 1)}
               >
                 <ChevronRight className="w-6 h-6 text-white" />
@@ -359,7 +353,7 @@ export default function MagazinePage() {
             <img
               src={`/magazine-images/${currentItem.cover.replace(/\.(jpg|jpeg|png)$/i, '.webp')}`}
               alt={currentItem.title}
-              className="max-h-[70vh] max-w-[85vw] object-contain rounded-lg shadow-2xl select-none"
+              className="max-h-[70vh] max-w-[85vw] object-contain rounded-lg shadow-2xl select-none pointer-events-auto"
               draggable={false}
             />
 
@@ -377,7 +371,7 @@ export default function MagazinePage() {
             </div>
 
             {/* 缩略图条 */}
-            <div className="mt-4 flex gap-2 overflow-x-auto max-w-[90vw] px-4 py-2 scrollbar-thin">
+            <div className="mt-4 flex gap-2 overflow-x-auto max-w-[90vw] px-4 py-2 scrollbar-thin pointer-events-auto">
               {data.years[currentYear].map((item, i) => (
                 <img
                   key={item.id}
