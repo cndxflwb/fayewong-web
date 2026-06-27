@@ -136,19 +136,10 @@ export default function MagazinePage() {
     return () => { document.body.style.overflow = ''; };
   }, [lightboxOpen]);
 
-  const openTimeRef = useRef<number>(0);
-
   const openLightbox = (year: string, index: number) => {
     setCurrentYear(year);
     setCurrentIndex(index);
     setLightboxOpen(true);
-    openTimeRef.current = Date.now();
-  };
-
-  const closeLightbox = () => {
-    // 防止打开瞬间被同一个 click 事件关闭
-    if (Date.now() - openTimeRef.current < 300) return;
-    setLightboxOpen(false);
   };
 
   const currentItem = currentYear ? data.years[currentYear]?.[currentIndex] : null;
@@ -303,7 +294,7 @@ export default function MagazinePage() {
       {lightboxOpen && currentItem && currentYear && (
         <div
           className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center"
-          onClick={closeLightbox}
+          onMouseDown={(e) => { if (e.target === e.currentTarget) setLightboxOpen(false); }}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
@@ -311,7 +302,7 @@ export default function MagazinePage() {
           {/* 关闭按钮 */}
           <button
             className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
-            onClick={closeLightbox}
+            onClick={() => setLightboxOpen(false)}
           >
             <X className="w-6 h-6 text-white" />
           </button>
@@ -320,10 +311,7 @@ export default function MagazinePage() {
           {currentIndex > 0 && (
             <button
               className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                setCurrentIndex(currentIndex - 1);
-              }}
+              onClick={() => setCurrentIndex(currentIndex - 1)}
             >
               <ChevronLeft className="w-6 h-6 text-white" />
             </button>
@@ -333,10 +321,7 @@ export default function MagazinePage() {
           {currentIndex < data.years[currentYear].length - 1 && (
             <button
               className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                setCurrentIndex(currentIndex + 1);
-              }}
+              onClick={() => setCurrentIndex(currentIndex + 1)}
             >
               <ChevronRight className="w-6 h-6 text-white" />
             </button>
@@ -347,11 +332,10 @@ export default function MagazinePage() {
             src={`/magazine-images/${currentItem.cover.replace(/\.(jpg|jpeg|png)$/i, '.webp')}`}
             alt={currentItem.title}
             className="max-h-[70vh] max-w-[85vw] object-contain rounded-lg shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
           />
 
           {/* 图片信息 */}
-          <div className="mt-4 text-center px-4" onClick={(e) => e.stopPropagation()}>
+          <div className="mt-4 text-center px-4">
             <p className="text-white text-sm font-medium">
               {currentItem.name} {currentItem.issue}
             </p>
@@ -366,7 +350,6 @@ export default function MagazinePage() {
           {/* 缩略图条 */}
           <div
             className="mt-4 flex gap-2 overflow-x-auto max-w-[90vw] px-4 py-2 scrollbar-thin"
-            onClick={(e) => e.stopPropagation()}
           >
             {data.years[currentYear].map((item, i) => (
               <img
