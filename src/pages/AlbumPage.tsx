@@ -38,7 +38,8 @@ export default function AlbumPage() {
             <LazyImage
               src={getImageUrl(album.images[0].filename)}
               alt={album.title}
-              className="w-full rounded-xl shadow-2xl shadow-primary/10"
+              className="w-full h-full object-cover rounded-xl shadow-2xl shadow-primary/10"
+              aspectRatio="aspect-square"
             />
           </div>
         ) : (

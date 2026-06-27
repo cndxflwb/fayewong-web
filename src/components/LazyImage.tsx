@@ -5,14 +5,15 @@ interface LazyImageProps {
   alt: string;
   className?: string;
   aspectRatio?: string;
+  containerClassName?: string;
 }
 
-export default function LazyImage({ src, alt, className = '', aspectRatio }: LazyImageProps) {
+export default function LazyImage({ src, alt, className = '', aspectRatio, containerClassName = '' }: LazyImageProps) {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
 
   return (
-    <div className={`relative overflow-hidden ${aspectRatio || ''}`}>
+    <div className={`relative overflow-hidden ${aspectRatio || ''} ${containerClassName}`}>
       {/* 骨架屏 */}
       {!loaded && !error && (
         <div className="absolute inset-0 bg-bg-dark animate-pulse">
