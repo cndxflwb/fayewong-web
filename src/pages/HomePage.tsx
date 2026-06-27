@@ -85,9 +85,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Timeline - Horizontal */}
-      <section className="py-16">
-        <h2 className="text-2xl font-bold text-text mb-12 text-center font-serif">
+      {/* Timeline - Horizontal (一屏高度) */}
+      <section className="relative h-[calc(100vh-4rem)] flex flex-col justify-center overflow-hidden">
+        {/* 装饰光晕背景 */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary rounded-full blur-[128px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-accent-teal rounded-full blur-[96px]" />
+        </div>
+
+        <h2 className="relative text-2xl font-bold text-text mb-12 text-center font-serif">
           編年時間線
         </h2>
 
