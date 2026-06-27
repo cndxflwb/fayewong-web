@@ -266,14 +266,14 @@ export default function MagazinePage() {
                   className="group cursor-pointer"
                   onClick={() => openLightbox(year, index)}
                 >
-                  <div className="relative overflow-hidden rounded-lg bg-bg-dark border border-primary/10 hover:border-primary/30 transition-all hover:shadow-lg hover:shadow-primary/5">
-                    <LazyImage
+                  <div className="relative overflow-hidden rounded-lg bg-bg-dark border border-primary/10 hover:border-primary/30 transition-all hover:shadow-lg hover:shadow-primary/5 h-[240px]">
+                    <img
                       src={`/magazine-images/${item.cover.replace(/\.(jpg|jpeg|png)$/i, '.webp')}`}
                       alt={item.title}
+                      loading="lazy"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      containerClassName="h-[240px]"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                   </div>
                   <div className="mt-2 px-1">
                     <h3 className="text-xs font-medium text-text truncate">
