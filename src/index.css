@@ -68,6 +68,8 @@
 .lightbox-dialog {
   border: none;
   outline: none;
+  display: none;
+  pointer-events: none;
 }
 
 .lightbox-dialog::backdrop {
@@ -77,6 +79,7 @@
 
 .lightbox-dialog[open] {
   display: flex;
+  pointer-events: auto;
   animation: fadeIn 0.2s ease-out;
 }
 
