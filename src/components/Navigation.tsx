@@ -14,7 +14,7 @@ const navLinks = [
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(true);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResultItem[]>([]);
   const location = useLocation();
@@ -103,88 +103,72 @@ export default function Navigation() {
               </Link>
             ))}
 
-            {/* 内联搜索框 */}
+            {/* 内联搜索框（始终展开） */}
             <div ref={searchRef} className="relative">
-              {searchOpen ? (
-                <div className="flex items-center">
-                  <div className="relative">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted" />
-                    <input
-                      ref={inputRef}
-                      type="text"
-                      value={query}
-                      onChange={(e) => handleSearch(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Escape') setSearchOpen(false);
-                        if (e.key === 'Enter' && query.trim()) {
-                          navigate(`/search?q=${encodeURIComponent(query)}`);
-                          setSearchOpen(false);
-                        }
-                      }}
-                      placeholder="搜索歌曲、專輯…"
-                      className="w-56 pl-8 pr-8 py-1.5 bg-bg-secondary/80 border border-primary/20 rounded-lg text-sm text-text placeholder:text-text-muted focus:outline-none focus:border-primary/50 transition-all"
-                    />
-                    <button
-                      onClick={() => { setSearchOpen(false); setQuery(''); setResults([]); }}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
-                    >
-                      <X className="w-3.5 h-3.5 text-text-muted hover:text-text" />
-                    </button>
-                  </div>
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted" />
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={query}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') { setQuery(''); setResults([]); inputRef.current?.blur(); }
+                    if (e.key === 'Enter' && query.trim()) {
+                      navigate(`/search?q=${encodeURIComponent(query)}`);
+                      setQuery(''); setResults([]);
+                    }
+                  }}
+                  onFocus={() => setSearchOpen(true)}
+                  placeholder="搜索歌曲、專輯…"
+                  className="w-48 pl-8 pr-3 py-1.5 bg-bg-secondary/80 border border-primary/20 rounded-lg text-sm text-text placeholder:text-text-muted focus:outline-none focus:border-primary/50 focus:w-56 transition-all"
+                />
+              </div>
 
-                  {/* 搜索结果下拉 */}
-                  {query.trim() && (
-                    <div className="absolute top-full right-0 mt-2 w-80 max-h-96 overflow-y-auto bg-bg-dark border border-primary/20 rounded-xl shadow-2xl shadow-black/50 z-50">
-                      {results.length > 0 ? (
-                        <div className="py-2">
-                          <p className="px-4 py-1 text-xs text-text-muted">
-                            找到 {results.length} 條結果
-                          </p>
-                          {results.slice(0, 8).map((item, idx) => (
-                            <Link
-                              key={`${item.slug}-${idx}`}
-                              to={getLink(item)}
-                              className="flex items-center gap-3 px-4 py-2.5 hover:bg-primary/10 transition-colors"
-                              onClick={() => { setSearchOpen(false); setQuery(''); setResults([]); }}
-                            >
-                              <span className="text-xs px-1.5 py-0.5 rounded bg-bg-secondary text-text-muted">
-                                {item.type === 'song' ? '曲' : item.type === 'album' ? '輯' : '人'}
-                              </span>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm text-text truncate">
-                                  {renderHighlight(item.title)}
-                                </p>
-                                {item.year && (
-                                  <span className="text-xs text-text-muted">{item.year}年</span>
-                                )}
-                              </div>
-                            </Link>
-                          ))}
-                          {results.length > 8 && (
-                            <Link
-                              to={`/search?q=${encodeURIComponent(query)}`}
-                              className="block px-4 py-2 text-xs text-primary hover:bg-primary/10 text-center border-t border-primary/10"
-                              onClick={() => { setSearchOpen(false); setQuery(''); setResults([]); }}
-                            >
-                              查看全部 {results.length} 條結果 →
-                            </Link>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="px-4 py-6 text-center text-sm text-text-muted">
-                          沒有找到匹配的結果
-                        </div>
+              {/* 搜索结果下拉 */}
+              {searchOpen && query.trim() && (
+                <div className="absolute top-full right-0 mt-2 w-80 max-h-96 overflow-y-auto bg-bg-dark border border-primary/20 rounded-xl shadow-2xl shadow-black/50 z-50">
+                  {results.length > 0 ? (
+                    <div className="py-2">
+                      <p className="px-4 py-1 text-xs text-text-muted">
+                        找到 {results.length} 條結果
+                      </p>
+                      {results.slice(0, 8).map((item, idx) => (
+                        <Link
+                          key={`${item.slug}-${idx}`}
+                          to={getLink(item)}
+                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-primary/10 transition-colors"
+                          onClick={() => { setQuery(''); setResults([]); }}
+                        >
+                          <span className="text-xs px-1.5 py-0.5 rounded bg-bg-secondary text-text-muted">
+                            {item.type === 'song' ? '曲' : item.type === 'album' ? '輯' : '人'}
+                          </span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-text truncate">
+                              {renderHighlight(item.title)}
+                            </p>
+                            {item.year && (
+                              <span className="text-xs text-text-muted">{item.year}年</span>
+                            )}
+                          </div>
+                        </Link>
+                      ))}
+                      {results.length > 8 && (
+                        <Link
+                          to={`/search?q=${encodeURIComponent(query)}`}
+                          className="block px-4 py-2 text-xs text-primary hover:bg-primary/10 text-center border-t border-primary/10"
+                          onClick={() => { setQuery(''); setResults([]); }}
+                        >
+                          查看全部 {results.length} 條結果 →
+                        </Link>
                       )}
+                    </div>
+                  ) : (
+                    <div className="px-4 py-6 text-center text-sm text-text-muted">
+                      沒有找到匹配的結果
                     </div>
                   )}
                 </div>
-              ) : (
-                <button
-                  onClick={openSearch}
-                  className="p-2 rounded-full hover:bg-primary/10 transition-colors cursor-pointer"
-                >
-                  <Search className="w-4 h-4 text-text-secondary" />
-                </button>
               )}
             </div>
           </div>
