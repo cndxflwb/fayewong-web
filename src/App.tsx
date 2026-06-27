@@ -35,7 +35,7 @@ function App() {
   return (
     <ThemeProvider>
       <LangProvider>
-        <BrowserRouter>
+        <BrowserRouter basename={import.meta.env.BASE_URL}>
           <ScrollToTop />
           <Suspense fallback={<PageLoader />}>
             <Routes>
