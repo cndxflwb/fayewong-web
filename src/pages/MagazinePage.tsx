@@ -90,13 +90,26 @@ export default function MagazinePage() {
     }
   }, [lightboxOpen]);
 
-  // dialog 原生关闭事件（Escape 键、点击 backdrop）
+  // dialog 原生关闭事件（Escape 键）
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
     const onClose = () => setLightboxOpen(false);
     dialog.addEventListener('close', onClose);
     return () => dialog.removeEventListener('close', onClose);
+  }, []);
+
+  // 点击 backdrop（空白处）关闭
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    const onClick = (e: MouseEvent) => {
+      if (e.target === dialog) {
+        dialog.close();
+      }
+    };
+    dialog.addEventListener('click', onClick);
+    return () => dialog.removeEventListener('click', onClick);
   }, []);
 
   // 键盘左右切换
@@ -313,7 +326,7 @@ export default function MagazinePage() {
         className="lightbox-dialog fixed inset-0 w-screen h-screen max-w-none max-h-none m-0 p-0 bg-black/95 backdrop-blur-sm z-[100] flex flex-col items-center justify-center"
       >
         {currentItem && currentYear && (
-          <div className="relative w-full h-full flex flex-col items-center justify-center">
+          <div className="relative w-full h-full flex flex-col items-center justify-center" onClick={(e) => e.stopPropagation()}>
             {/* 关闭按钮 */}
             <button
               className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors cursor-pointer z-10"
