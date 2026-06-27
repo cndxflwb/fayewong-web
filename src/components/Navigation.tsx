@@ -1,15 +1,17 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Search, Music2 } from 'lucide-react';
+import { Menu, X, Search, Music2, Sun, Moon, Globe } from 'lucide-react';
 import { search, highlightText } from '../lib/search';
 import type { SearchResultItem } from '../lib/search';
+import { useTheme } from '../contexts/ThemeContext';
+import { useLang } from '../contexts/LangContext';
 
 const navLinks = [
-  { path: '/', label: '時間線' },
-  { path: '/index/songs', label: '索引' },
-  { path: '/magazine', label: '雜誌' },
-  { path: '/stats', label: '統計' },
-  { path: '/about', label: '關於' },
+  { path: '/', labelKey: 'nav.timeline' },
+  { path: '/index/songs', labelKey: 'nav.index' },
+  { path: '/magazine', labelKey: 'nav.magazine' },
+  { path: '/stats', labelKey: 'nav.stats' },
+  { path: '/about', labelKey: 'nav.about' },
 ];
 
 export default function Navigation() {
@@ -21,6 +23,8 @@ export default function Navigation() {
   const navigate = useNavigate();
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { theme, toggleTheme } = useTheme();
+  const { lang, setLang, t } = useLang();
 
   // 点击外部关闭搜索
   useEffect(() => {
@@ -99,7 +103,7 @@ export default function Navigation() {
                     : 'text-text-secondary'
                 }`}
               >
-                {link.label}
+                {t(link.labelKey)}
               </Link>
             ))}
 
@@ -120,7 +124,7 @@ export default function Navigation() {
                     }
                   }}
                   onFocus={() => setSearchOpen(true)}
-                  placeholder="搜索歌曲、專輯…"
+                  placeholder={t('nav.search_placeholder')}
                   className="w-48 pl-8 pr-3 py-1.5 bg-bg-secondary/80 border border-primary/20 rounded-lg text-sm text-text placeholder:text-text-muted focus:outline-none focus:border-primary/50 focus:w-56 transition-all"
                 />
               </div>
@@ -171,6 +175,25 @@ export default function Navigation() {
                 </div>
               )}
             </div>
+
+            {/* 主题切换 */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg hover:bg-primary/10 transition-colors text-text-secondary hover:text-primary"
+              title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+
+            {/* 语言切换 */}
+            <button
+              onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+              className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-primary/10 transition-colors text-text-secondary hover:text-primary text-xs font-medium"
+              title={lang === 'zh' ? 'Switch to English' : '切換為中文'}
+            >
+              <Globe className="w-4 h-4" />
+              <span>{lang === 'zh' ? 'EN' : '中'}</span>
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -206,7 +229,7 @@ export default function Navigation() {
                     setResults([]);
                   }
                 }}
-                placeholder="搜索歌曲、專輯…"
+                placeholder={t('nav.search_placeholder')}
                 className="w-full pl-10 pr-4 py-2.5 bg-bg-secondary/50 border border-primary/20 rounded-lg text-sm text-text placeholder:text-text-muted focus:outline-none focus:border-primary/50 transition-all"
               />
             </div>
@@ -248,9 +271,26 @@ export default function Navigation() {
                     : 'text-text-secondary hover:bg-primary/10 hover:text-primary'
                 }`}
               >
-                {link.label}
+                {t(link.labelKey)}
               </Link>
             ))}
+            {/* 移动端主题/语言切换 */}
+            <div className="flex items-center gap-3 px-4 pt-3 border-t border-primary/10">
+              <button
+                onClick={toggleTheme}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors text-text-secondary text-sm"
+              >
+                {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
+              </button>
+              <button
+                onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-primary/10 transition-colors text-text-secondary text-sm"
+              >
+                <Globe className="w-4 h-4" />
+                <span>{lang === 'zh' ? 'English' : '中文'}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect, lazy, Suspense } from 'react';
 import Layout from './components/Layout';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { LangProvider } from './contexts/LangContext';
 
 // 路由懒加载 - 各页面按需加载
 const HomePage = lazy(() => import('./pages/HomePage'));
@@ -31,24 +33,28 @@ function PageLoader() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <ScrollToTop />
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<HomePage />} />
-            <Route path="year/:year" element={<YearPage />} />
-            <Route path="album/:slug" element={<AlbumPage />} />
-            <Route path="song/:slug" element={<SongPage />} />
-            <Route path="index/:category" element={<IndexPage />} />
-            <Route path="search" element={<SearchPage />} />
-            <Route path="about" element={<AboutPage />} />
-            <Route path="magazine" element={<MagazinePage />} />
-            <Route path="stats" element={<StatsPage />} />
-          </Route>
-        </Routes>
-      </Suspense>
-    </BrowserRouter>
+    <ThemeProvider>
+      <LangProvider>
+        <BrowserRouter>
+          <ScrollToTop />
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<HomePage />} />
+                <Route path="year/:year" element={<YearPage />} />
+                <Route path="album/:slug" element={<AlbumPage />} />
+                <Route path="song/:slug" element={<SongPage />} />
+                <Route path="index/:category" element={<IndexPage />} />
+                <Route path="search" element={<SearchPage />} />
+                <Route path="about" element={<AboutPage />} />
+                <Route path="magazine" element={<MagazinePage />} />
+                <Route path="stats" element={<StatsPage />} />
+              </Route>
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </LangProvider>
+    </ThemeProvider>
   );
 }
 

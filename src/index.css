@@ -4,9 +4,46 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap');
 
+/* 暗色主题（默认） */
+:root,
+[data-theme="dark"] {
+  --color-primary: 201 169 110;
+  --color-primary-dark: 139 105 20;
+  --color-primary-light: 232 213 163;
+  --color-bg: 34 34 64;
+  --color-bg-secondary: 30 42 74;
+  --color-bg-dark: 24 24 40;
+  --color-text: 245 245 245;
+  --color-text-secondary: 184 184 204;
+  --color-text-muted: 136 136 170;
+  --color-accent-teal: 78 205 196;
+  --color-accent-red: 255 107 107;
+  --color-accent-yellow: 255 230 109;
+  --color-accent-mint: 149 225 211;
+}
+
+/* 浅色主题 */
+[data-theme="light"] {
+  --color-primary: 139 105 20;
+  --color-primary-dark: 107 79 14;
+  --color-primary-light: 201 169 110;
+  --color-bg: 248 246 241;
+  --color-bg-secondary: 237 232 223;
+  --color-bg-dark: 226 220 211;
+  --color-text: 26 26 46;
+  --color-text-secondary: 74 74 90;
+  --color-text-muted: 122 122 138;
+  --color-accent-teal: 43 168 158;
+  --color-accent-red: 224 85 85;
+  --color-accent-yellow: 212 168 0;
+  --color-accent-mint: 92 184 168;
+}
+
 @layer base {
   body {
-    @apply bg-bg text-text font-sans antialiased;
+    background-color: rgb(var(--color-bg));
+    color: rgb(var(--color-text));
+    @apply font-sans antialiased;
   }
 
   p {
@@ -18,22 +55,23 @@
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-bg-dark;
+    background-color: rgb(var(--color-bg-dark));
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-primary/30 rounded-full;
+    background-color: rgb(var(--color-primary) / 0.3);
+    border-radius: 9999px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-primary/50;
+    background-color: rgb(var(--color-primary) / 0.5);
   }
 }
 
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: theme('colors.primary / 0.3') transparent;
+    scrollbar-color: rgb(var(--color-primary) / 0.3) transparent;
   }
 
   .scrollbar-thin::-webkit-scrollbar {
@@ -45,12 +83,12 @@
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: theme('colors.primary / 0.3');
+    background: rgb(var(--color-primary) / 0.3);
     border-radius: 3px;
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: theme('colors.primary / 0.5');
+    background: rgb(var(--color-primary) / 0.5);
   }
 }
 

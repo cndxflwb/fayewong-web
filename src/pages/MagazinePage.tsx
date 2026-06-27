@@ -79,15 +79,18 @@ export default function MagazinePage() {
     container.scrollTo({ left: scrollTarget, behavior: 'smooth' });
   }, [activeNavYear, years]);
 
-  // 打开/关闭 dialog
+  // 打开/关闭 dialog + 锁定背景滚动
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
     if (lightboxOpen) {
       dialog.showModal();
+      document.body.style.overflow = 'hidden';
     } else {
       dialog.close();
+      document.body.style.overflow = '';
     }
+    return () => { document.body.style.overflow = ''; };
   }, [lightboxOpen]);
 
   // dialog 原生关闭事件（Escape 键）
